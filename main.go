@@ -24,6 +24,15 @@ import (
 )
 
 var (
+	// RELEASE returns the release version
+	Release = "UNKNOWN"
+	// REPO returns the git repository URL
+	Repo = "UNKNOWN"
+	// COMMIT returns the short sha from git
+	Commit = "UNKNOWN"
+
+	BuildTime = "UNKNOWN"
+
 // scheme   = runtime.NewScheme()
 // setupLog = ctrl.Log.WithName("setup")
 )
