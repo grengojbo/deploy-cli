@@ -29,6 +29,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
@@ -55,9 +56,13 @@ type RootFlags struct {
 	traceLogging       bool
 	timestampedLogging bool
 	version            bool
+	cfgFile            string
+	Environments       []string
 }
 
-var flags = RootFlags{}
+var AppFlags = RootFlags{}
+var envs = []string{}
+var Verbose bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -68,7 +73,7 @@ Deploy wrapper CLI that helps you to easily git, dockec, podman, docker-compose,
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("Start...")
-		if flags.version {
+		if AppFlags.version {
 			printVersion()
 		} else {
 			if err := cmd.Usage(); err != nil {
@@ -101,18 +106,39 @@ func Execute() {
 
 func init() {
 
-	rootCmd.PersistentFlags().BoolVar(&flags.debugLogging, "verbose", false, "Enable verbose output (debug logging)")
-	rootCmd.PersistentFlags().BoolVar(&flags.traceLogging, "trace", false, "Enable super verbose output (trace logging)")
-	rootCmd.PersistentFlags().BoolVar(&flags.timestampedLogging, "timestamps", false, "Enable Log timestamps")
+	// defaultConfigName = "env"
+	// cobra.OnInitialize(initConfig)
+	// Init
+	cobra.OnInitialize(initLogging, initConfig)
+	// cobra.OnInitialize(initLogging, initRuntime)
+
+	rootCmd.PersistentFlags().BoolVar(&AppFlags.debugLogging, "verbose", false, "Enable verbose output (debug logging)")
+	rootCmd.PersistentFlags().BoolVar(&AppFlags.traceLogging, "trace", false, "Enable super verbose output (trace logging)")
+	rootCmd.PersistentFlags().BoolVar(&AppFlags.timestampedLogging, "timestamps", false, "Enable Log timestamps")
+
+	rootCmd.PersistentFlags().String("host", "", "SSH Host name or IP addres")
+	_ = viper.BindPFlag("host", rootCmd.PersistentFlags().Lookup("host"))
+
+	rootCmd.PersistentFlags().StringP("password", "p", "", "SSH password")
+	_ = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
+	_ = viper.BindEnv("password", "SECRET_SSH_PASSWORD")
+
+	rootCmd.PersistentFlags().StringP("user", "u", "", "SSH Username")
+	_ = viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user"))
+	_ = viper.BindEnv("user", "SECRET_SSH_USERNAME")
+
+	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set", []string{}, "Set environment variable")
+	// log.Warnf("ENV: %v", &envs)
+
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show run command")
 	_ = viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
 
 	// add local flags
-	rootCmd.Flags().BoolVar(&flags.version, "version", false, "Show deploy-cli version")
+	rootCmd.Flags().BoolVar(&AppFlags.version, "version", false, "Show deploy-cli version")
 
 	// add subcommands
-	// rootCmd.AddCommand(NewCmdCompletion())
-	// rootCmd.AddCommand(cluster.NewCmdCluster())
+	rootCmd.AddCommand(NewCmdCompletion())
+	rootCmd.AddCommand(NewCmdRun())
 	// rootCmd.AddCommand(kubeconfig.NewCmdKubeconfig())
 	// rootCmd.AddCommand(node.NewCmdNode())
 	// rootCmd.AddCommand(image.NewCmdImage())
@@ -128,16 +154,55 @@ func init() {
 		},
 	})
 
-	// Init
-	cobra.OnInitialize(initLogging)
-	// cobra.OnInitialize(initLogging, initRuntime)
+}
+
+// initConfig читает в файле конфигурации и переменных ENV, если они установлены.
+func initConfig() {
+
+	if AppFlags.cfgFile != "" {
+		// Use config file from the flag.
+		viper.AddConfigPath("$HOME")
+		viper.AddConfigPath(".")
+		viper.SetConfigFile(AppFlags.cfgFile)
+
+	} else {
+		// Find home directory.
+		home, err := homedir.Dir()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Search config in home directory with name ".bboxApi" (without extension).
+		// viper.AddConfigPath(home)
+		// viper.AddConfigPath(".")
+		// viper.SetConfigName(defaultConfigName)
+		log.Debugln("Home: ", home)
+		// fmt.Println("------------- initConfig -----------", home)
+	}
+
+	viper.AutomaticEnv() // read in environment variables that match
+
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		if Verbose {
+			fmt.Println("Using config file:", viper.ConfigFileUsed())
+		}
+
+		// viper.WatchConfig()
+		// viper.OnConfigChange(func(e fsnotify.Event) {
+		// 	if Verbose {
+		// 		fmt.Println("Config file changed:", e.Name)
+		// 	}
+		// })
+	}
 }
 
 // initLogging initializes the logger
 func initLogging() {
-	if flags.traceLogging {
+	if AppFlags.traceLogging {
 		log.SetLevel(log.TraceLevel)
-	} else if flags.debugLogging {
+	} else if AppFlags.debugLogging {
 		log.SetLevel(log.DebugLevel)
 	} else {
 		switch logLevel := strings.ToUpper(os.Getenv("LOG_LEVEL")); logLevel {
@@ -176,7 +241,7 @@ func initLogging() {
 		ForceColors: true,
 	}
 
-	if flags.timestampedLogging || os.Getenv("LOG_TIMESTAMPS") != "" {
+	if AppFlags.timestampedLogging || os.Getenv("LOG_TIMESTAMPS") != "" {
 		formatter.FullTimestamp = true
 	}
 

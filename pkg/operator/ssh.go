@@ -17,7 +17,7 @@ type SSHOperator struct {
 // NewSshConnection New SSH Connection
 func (r *SSHOperator) NewSSHOperator(node *types.NodeOpts) {
 	r.Config = &easyssh.MakeConfig{
-		User: node.Username,
+		User: node.User,
 		// Optional key or Password without either we try to contact your agent SOCKET
 		// Password: "password",
 		// Paste your source content of private key

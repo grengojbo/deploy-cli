@@ -84,9 +84,13 @@ const DefaultSshPort = 22
 
 // NodeOpts set of options one can connection to node
 type NodeOpts struct {
-	Host     string `mapstructure:"host,omitempty" yaml:"host" json:"host"`
-	Protocol string `mapstructure:"protocol,omitempty" yaml:"protocol,omitempty" json:"protocol,omitempty"` // default: http
-	Username string `mapstructure:"username,omitempty" yaml:"username,omitempty" json:"username,omitempty"`
+	// Name The bastion Name
+	Name string `mapstructure:"name" yaml:"name" json:"name,omitempty"`
+	Host string `mapstructure:"host,omitempty" yaml:"host" json:"host"`
+	// User SSH user is empty use root
+	// +optional
+	User string `mapstructure:"user,omitempty" yaml:"user,omitempty" json:"user,omitempty"`
+	// Protocol string `mapstructure:"protocol,omitempty" yaml:"protocol,omitempty" json:"protocol,omitempty"` // default: http
 	Password string `mapstructure:"password,omitempty" yaml:"password,omitempty" json:"password,omitempty"`
 	// SshPort specifies the port the SSH bastion host.
 	// Defaults to 22.
@@ -100,6 +104,7 @@ type NodeOpts struct {
 	RemoteConnectionString string `mapstructure:"remoteConnectionString,omitempty" yaml:"remoteConnectionString,omitempty" json:"remoteConnectionString,omitempty"`
 	// RemoteSudo TODO: tranclate если через bastion и пользовател на приватном хосте не root устанавливается true
 	// +optional
+	Workdir    string        `mapstructure:"workdir,omitempty" yaml:"workdir" json:"workdir"`
 	RemoteSudo string        `mapstructure:"remoteSudo,omitempty" yaml:"remoteSudo,omitempty" json:"remoteSudo,omitempty"`
 	Env        EnvList       `mapstructure:"env,omitempty" yaml:"env" json:"env,omitempty"`
 	Bastion    string        `mapstructure:"bastion,omitempty" yaml:"bastion" json:"bastion,omitempty"` // Jump host for the environment
