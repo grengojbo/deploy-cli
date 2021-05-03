@@ -25,3 +25,5 @@ deploy-cli
 *~
 
 variables/
+tmp/
+cmd/cluster/
