@@ -4,6 +4,10 @@ IMG ?= controller:latest
 # Produce CRDs that work back to Kubernetes 1.11 (no version conversion)
 CRD_OPTIONS ?= "crd:trivialVersions=true"
 
+Version := $(shell git describe --tags --dirty)
+# Version := "dev"
+GitCommit := $(shell git rev-parse HEAD)
+LDFLAGS := "-s -w -X github.com/grengojbo/deploy-cli/version.Version=$(Version) -X github.com/grengojbo/deploy-cli/version.GitCommit=$(GitCommit)"
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -15,11 +19,19 @@ endif
 all: manager
 
 # Run tests
-test: generate fmt vet manifests
-	go test ./... -coverprofile cover.out
+# test: generate fmt vet manifests
+test: fmt vet
+	@#go test ./... -coverprofile cover.out
+	@#CGO_ENABLED=0 go test $(shell go list ./... | grep -v /vendor/|xargs echo) -cover
+	@mkdir -p ./tmp/test-reports
+	@gotestsum --junitfile ./tmp/test-reports/unit-tests.xml
 
 build: # Build k3ctl binary
 	go build -o deploy-cli main.go
+
+release:  ## Build release
+	@mkdir -p dist
+	CGO_ENABLED=0 GOOS=linux go build -a -ldflags $(LDFLAGS) -installsuffix cgo -o dist/deploy-cli main.go
 
 manager: generate fmt vet
 	go build -ldflags "-X main.isCli=no" -o bin/manager main.go
@@ -27,6 +39,9 @@ manager: generate fmt vet
 # Run against the configured Kubernetes cluster in ~/.kube/config
 run: generate fmt vet manifests
 	go run ./main.go
+
+init:  ## Initialize app
+	@curl -sSL "https://github.com/gotestyourself/gotestsum/releases/download/v0.3.1/gotestsum_0.3.1_linux_amd64.tar.gz" | sudo tar -xz -C /usr/local/bin gotestsum 
 
 # Install CRDs into a cluster
 install: manifests

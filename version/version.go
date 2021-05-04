@@ -29,6 +29,8 @@ package version
 // Version is the string that contains version
 var Version string
 
+var GitCommit string
+
 // HelperVersionOverride decouples the k3d helper image versions from the main version, if needed
 var HelperVersionOverride string
 

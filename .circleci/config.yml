@@ -17,13 +17,25 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
-      # - run:
-      #     name: Run tests
-      #     command: |
-      #       mkdir -p /tmp/test-reports
-      #       gotestsum --junitfile /tmp/test-reports/unit-tests.xml
-      # - store_test_results:
-      #     path: /tmp/test-reports
+      - run:
+          name: Run tests
+          command: |
+            mkdir -p /tmp/test-reports
+            gotestsum --junitfile /tmp/test-reports/unit-tests.xml
+      - store_test_results:
+          path: /tmp/test-reports
+      - run:
+          name: Run Build
+          command: |
+            mkdir -p dist
+            GitCommit=$(git rev-parse HEAD)
+            Version="1-dev"
+            echo "GitCommit: ${GitCommit}"
+            LDFLAGS := "-s -w -X github.com/grengojbo/deploy-cli/version.Version=${Version} -X github.com/grengojbo/deploy-cli/version.GitCommit=${GitCommit}"
+            CGO_ENABLED=0 GOOS=linux go build -a -ldflags ${LDFLAGS} -installsuffix cgo -o dist/deploy-cli main.go
+      - store_artifacts:
+          path: ./dist
+          destination: dist
 orbs:
   jira: circleci/jira@1.3.1
 workflows:
