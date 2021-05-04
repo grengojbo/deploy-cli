@@ -67,7 +67,7 @@ func GerConfigFileName(configFile string, env string) (configFilePath string) {
 	if len(env) == 0 {
 		env = "default"
 	}
-	messageError := "Is NOT cluster config file:"
+	messageError := "Is NOT config file:"
 	if configFile == "sample" {
 		return "config/samples/k3s_v1alpha1_cluster.yaml"
 	}

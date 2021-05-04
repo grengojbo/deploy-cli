@@ -3,7 +3,7 @@ package cmd
 import (
 	"strings"
 
-	"github.com/grengojbo/deploy-cli/pkg/config"
+	"github.com/grengojbo/deploy-cli/cmd/util"
 	"github.com/grengojbo/deploy-cli/pkg/operator"
 	"github.com/grengojbo/deploy-cli/pkg/types"
 	log "github.com/sirupsen/logrus"
@@ -12,6 +12,10 @@ import (
 )
 
 var command string
+var spec *types.DeploySpec
+
+// var node *types.NodeOpts
+var err error
 
 // NewCmdNode returns a new cobra command
 func NewCmdRun() *cobra.Command {
@@ -21,6 +25,7 @@ func NewCmdRun() *cobra.Command {
 		Use:   "run",
 		Short: "Run command in node(s)",
 		Long:  `Run command in  node(s)`,
+		Args:  cobra.RangeArgs(0, 1),
 		Run: func(c *cobra.Command, args []string) {
 			// if err := c.Help(); err != nil {
 			// 	log.Errorln("Couldn't get help text")
@@ -34,28 +39,22 @@ func NewCmdRun() *cobra.Command {
 				log.Infof("environments: %s", strings.ToLower(viper.GetString("env")))
 			}
 
-			host := viper.GetString("host")
-			if len(host) == 0 {
-				log.Fatalln("IS NOT set host")
+			spec, err = util.FromViper(args)
+			if err != nil {
+				log.Errorln(err.Error())
 			}
-			if len(args) > 0 {
-				config.InitConfig(args[0], strings.ToLower(viper.GetString("env")))
-			}
-			node := &types.NodeOpts{
-				User:             viper.GetString("user"),
-				Host:             host,
-				Password:         viper.GetString("password"),
-				Workdir:          viper.GetString("workdir"),
-				SSHAuthorizedKey: viper.GetString("ssh-key"),
-				SshPort:          viper.GetInt32("ssh-port"),
-				SSHKey:           viper.GetString("secret-ssh-key"),
-				SSHPassphrase:    viper.GetString("ssh-passphrase"),
-			}
-			node.SetEnv(AppFlags.Environments)
+			// if len(args) == 0 {
+			// 	if len(viper.GetString("host")) == 0 {
+			// 		log.Fatalln("IS NOT set host")
+			// 	}
+			// 	spec.Node.Host = viper.GetString("host")
+			// }
+
+			spec.Node.SetEnv(AppFlags.Environments)
 			// log.Infof("ssh %s@%s", node.User, node.Host)
 			// log.Infof("command: %s%s", node.GetWorkdir(), node.GetEnvExport())
 			if len(command) > 0 {
-				if err := operator.RunSshCommand(command, node, viper.GetBool("dry-run")); err != nil {
+				if err := operator.RunSshCommand(command, spec, viper.GetBool("dry-run")); err != nil {
 					log.Fatal(err.Error())
 				}
 			} else {

@@ -85,6 +85,15 @@ const DefaultConfigDirName = ".deploy" // should end up in $HOME/
 // DefaultSshPort defines the default SSH Port
 const DefaultSshPort = 22
 
+// DefaultSSHKeyPath The ssh key to use for remote login
+const DefaultSSHKeyPath = "~/.ssh/id_rsa"
+
+type DeploySpec struct {
+	Name    string    `mapstructure:"name" yaml:"name" json:"name,omitempty"`
+	Node    *NodeOpts `mapstructure:"node" yaml:"node" json:"node,omitempty"`
+	Bastion *NodeOpts `mapstructure:"bastion" yaml:"bastion" json:"bastion,omitempty"`
+}
+
 // NodeOpts set of options one can connection to node
 type NodeOpts struct {
 	// Name The bastion Name

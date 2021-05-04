@@ -114,14 +114,14 @@ func init() {
 	_ = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	_ = viper.BindEnv("password", "SECRET_SSH_PASSWORD")
 
-	rootCmd.PersistentFlags().StringP("user", "u", "root", "Username for SSH login")
+	rootCmd.PersistentFlags().StringP("user", "u", "", "Username for SSH login")
 	_ = viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user"))
 	_ = viper.BindEnv("user", "SECRET_SSH_USERNAME")
 
-	rootCmd.PersistentFlags().String("ssh-key", "~/.ssh/id_rsa", "The ssh key to use for remote login")
+	rootCmd.PersistentFlags().String("ssh-key", types.DefaultSSHKeyPath, "The ssh key to use for remote login")
 	_ = viper.BindPFlag("ssh-key", rootCmd.PersistentFlags().Lookup("ssh-key"))
 
-	rootCmd.PersistentFlags().Int("ssh-port", 22, "The port on which to connect for ssh")
+	rootCmd.PersistentFlags().Int("ssh-port", types.DefaultSshPort, "The port on which to connect for ssh")
 	_ = viper.BindPFlag("ssh-port", rootCmd.PersistentFlags().Lookup("ssh-port"))
 
 	// rootCmd.PersistentFlags().Bool("sudo", true, "Use sudo for installation. e.g. set to false when using the root user and no sudo is available.")

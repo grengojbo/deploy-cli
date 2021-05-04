@@ -7,9 +7,12 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var CfgViper = viper.New()
+// var CfgViper = viper.New()
 
-func InitConfig(cFile string, env string) {
+//
+func GetViperConfig(cFile string, env string) (cfgViper *viper.Viper) {
+
+	cfgViper = viper.New()
 
 	// cfgViper.SetEnvPrefix("K3S")
 	// cfgViper.AutomaticEnv()
@@ -17,9 +20,9 @@ func InitConfig(cFile string, env string) {
 	// cfgViper.SetConfigType("yaml")
 
 	configFile := util.GerConfigFileName(cFile, env)
-	CfgViper.SetConfigFile(configFile)
+	cfgViper.SetConfigFile(configFile)
 
-	if err := CfgViper.ReadInConfig(); err != nil {
+	if err := cfgViper.ReadInConfig(); err != nil {
 		if _, ok := err.(viper.ConfigFileNotFoundError); ok {
 			log.Fatalf("Config file %s not found: %+v", configFile, err)
 		}
@@ -27,11 +30,12 @@ func InitConfig(cFile string, env string) {
 		log.Fatalf("Failed to read config file %s: %+v", configFile, err)
 	}
 
-	log.Infof("Using config file %s", CfgViper.ConfigFileUsed())
+	log.Infof("Using config file %s", cfgViper.ConfigFileUsed())
 
 	if log.GetLevel() >= log.DebugLevel {
-		c, _ := yaml.Marshal(CfgViper.AllSettings())
+		c, _ := yaml.Marshal(cfgViper.AllSettings())
 		log.Debugf("Configuration:\n%s", c)
 
 	}
+	return cfgViper
 }
