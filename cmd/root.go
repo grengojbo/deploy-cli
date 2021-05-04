@@ -128,7 +128,10 @@ func init() {
 	// _ = viper.BindPFlag("sudo", rootCmd.PersistentFlags().Lookup("sudo"))
 
 	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set-env", []string{}, "Set environment variable")
-	// log.Warnf("ENV: %v", &envs)
+
+	rootCmd.PersistentFlags().StringP("env", "e", "", "Set environment developer, testing, staging, production")
+	_ = viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env"))
+
 	// cmd.Flags().StringArrayP("port", "p", nil, "Map ports from the node containers to the host (Format: `[HOST:][HOSTPORT:]CONTAINERPORT[/PROTOCOL][@NODEFILTER]`)\n - Example: `k3d cluster create --agents 2 -p 8080:80@agent[0] -p 8081@agent[1]`")
 	// _ = ppViper.BindPFlag("cli.ports", cmd.Flags().Lookup("port"))
 

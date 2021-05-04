@@ -1,6 +1,8 @@
 package cmd
 
 import (
+	"strings"
+
 	"github.com/grengojbo/deploy-cli/pkg/operator"
 	"github.com/grengojbo/deploy-cli/pkg/types"
 	log "github.com/sirupsen/logrus"
@@ -27,6 +29,9 @@ func NewCmdRun() *cobra.Command {
 				log.Fatalln("RUN command disable. Please read the documentation https://zerobox.atlassian.net/wiki/external/10420225/MzhiNWJmMzUyY2Y0NGI0ZThlNTdhYmNlYmI1ZTJjMjU?atlOrigin=eyJpIjoiOTlhODQ1NTkwMDJkNDVhZGE5MTc0Y2UyMmZkZTUwNTUiLCJwIjoiYyJ9")
 			}
 			log.Infoln("Start Run command...")
+			if len(viper.GetString("env")) > 0 {
+				log.Infof("environments: %s", strings.ToLower(viper.GetString("env")))
+			}
 
 			host := viper.GetString("host")
 			if len(host) == 0 {
