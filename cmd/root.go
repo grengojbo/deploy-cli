@@ -114,21 +114,24 @@ func init() {
 	_ = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	_ = viper.BindEnv("password", "SECRET_SSH_PASSWORD")
 
-	rootCmd.PersistentFlags().StringP("user", "u", "root", "Username for SSH login")
+	rootCmd.PersistentFlags().StringP("user", "u", "", "Username for SSH login")
 	_ = viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user"))
 	_ = viper.BindEnv("user", "SECRET_SSH_USERNAME")
 
-	rootCmd.PersistentFlags().String("ssh-key", "~/.ssh/id_rsa", "The ssh key to use for remote login")
+	rootCmd.PersistentFlags().String("ssh-key", types.DefaultSSHKeyPath, "The ssh key to use for remote login")
 	_ = viper.BindPFlag("ssh-key", rootCmd.PersistentFlags().Lookup("ssh-key"))
 
-	rootCmd.PersistentFlags().Int("ssh-port", 22, "The port on which to connect for ssh")
+	rootCmd.PersistentFlags().Int("ssh-port", types.DefaultSshPort, "The port on which to connect for ssh")
 	_ = viper.BindPFlag("ssh-port", rootCmd.PersistentFlags().Lookup("ssh-port"))
 
 	// rootCmd.PersistentFlags().Bool("sudo", true, "Use sudo for installation. e.g. set to false when using the root user and no sudo is available.")
 	// _ = viper.BindPFlag("sudo", rootCmd.PersistentFlags().Lookup("sudo"))
 
-	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set", []string{}, "Set environment variable")
-	// log.Warnf("ENV: %v", &envs)
+	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set-env", []string{}, "Set environment variable")
+
+	rootCmd.PersistentFlags().StringP("env", "e", "", "Set environment developer, testing, staging, production")
+	_ = viper.BindPFlag("env", rootCmd.PersistentFlags().Lookup("env"))
+
 	// cmd.Flags().StringArrayP("port", "p", nil, "Map ports from the node containers to the host (Format: `[HOST:][HOSTPORT:]CONTAINERPORT[/PROTOCOL][@NODEFILTER]`)\n - Example: `k3d cluster create --agents 2 -p 8080:80@agent[0] -p 8081@agent[1]`")
 	// _ = ppViper.BindPFlag("cli.ports", cmd.Flags().Lookup("port"))
 
@@ -139,6 +142,11 @@ func init() {
 
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show run command")
 	_ = viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
+	viper.SetDefault("secret-ssh-key", "")
+	_ = viper.BindEnv("secret-ssh-key", "SECRET_SSH_KEY")
+	_ = viper.BindEnv("ssh-passphrase", "SECRET_SSH_PASSPHRASE")
+	viper.SetDefault("disable-run-command", false)
+	_ = viper.BindEnv("disable-run-command", "SECRET_DEPLOY_DISABLE_RUN")
 
 	// add local flags
 	rootCmd.Flags().BoolVar(&AppFlags.version, "version", false, "Show deploy-cli version")

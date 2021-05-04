@@ -8,10 +8,11 @@ import (
 )
 
 // / RunSshCommand выполнение комманд на удаленном хосте по ssh TODO: tranclate
-func RunSshCommand(myCommand string, node *types.NodeOpts, dryRun bool) error {
+func RunSshCommand(myCommand string, spec *types.DeploySpec, dryRun bool) error {
 	ssh := SSHOperator{}
-	ssh.NewSSHOperator(node)
-	prepareCommand := fmt.Sprintf("%s%s%s", node.GetEnvExport(), node.GetWorkdir(), myCommand)
+	ssh.NewSSHOperator(spec.Node)
+	prepareCommand := fmt.Sprintf("%s%s%s", spec.Node.GetEnvExport(), spec.Node.GetWorkdir(), myCommand)
+	log.Infof("Connection: ssh %s@%s ...", spec.Node.User, spec.Node.Host)
 	if dryRun {
 		log.Infof("Executing: %s\n", prepareCommand)
 	} else {

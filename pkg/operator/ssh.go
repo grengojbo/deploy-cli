@@ -49,9 +49,17 @@ func (r *SSHOperator) NewSSHOperator(node *types.NodeOpts) {
 	r.Config.Server = node.Host
 	if len(node.Password) > 0 {
 		r.Config.Password = node.Password
+		log.Debugln("Set password: ****")
+	} else if len(node.SSHKey) > 0 {
+		r.Config.Key = node.SSHKey
+		log.Debugln("Set source content of private key: ****")
 	} else if len(node.SSHAuthorizedKey) > 0 {
 		r.Config.KeyPath = util.ExpandPath(node.SSHAuthorizedKey)
 		log.Debugf("sshKeyPath: %s", r.Config.KeyPath)
+	}
+	if len(node.SSHPassphrase) > 0 {
+		r.Config.Passphrase = node.SSHPassphrase
+		log.Debugln("Set PrivateKey With Passphrase: ****")
 	}
 	// log.Debugf("ssh -i %s %s@%s:%s", ssh.KeyPath, ssh.User, ssh.Server, ssh.Port)
 }

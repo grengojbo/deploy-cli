@@ -1,0 +1,18 @@
+kind: simple
+name: my-name
+node:
+  name: vm-1
+  host: localhost
+  user: ubuntu
+  # password: "123"
+  # sshPort: 2222
+  # sshAuthorizedKey: "~/keys/noname.pem"
+  workdir: "/opt/app"
+  bastion: my-bastion
+bastion:
+  name: my-bastion
+  host: localhost
+  user: ubuntu
+  # password: "123"
+  # sshPort: 2222
+  # sshAuthorizedKey: "~/keys/noname.pem"

@@ -7,12 +7,18 @@ Deploy Utility GIT, Docker, Podman
 ./deploy-cli -p <PASSWORD> <COMMAND>
 ```
 Устанавливайте пароль через системные переменнын
+
+ - SECRET_SSH_KEY - Paste your source content of private key (только через системные переменные)
+ - SECRET_SSH_PASSPHRASE - Parse PrivateKey With Passphrase (только через системные переменнын)
+ - SECRET_SSH_PASSWORD
+ - SECRET_SSH_USERNAME
+
 ```shell
 SECRET_SSH_PASSWORD=zzz23 ./deploy-cli run
 ```
 
 ```shell
-./deploy-cli run --host=example.com -w /home/ubuntu/appname --set=MY_VAR=223=22,MY=weqwe --dry-run --verbose -c "pwd"
+./deploy-cli run --host=example.com -w /home/ubuntu/appname --set-env=MY_VAR=223=22,MY=weqwe --dry-run --verbose -c "pwd"
 ```
 
 Установка системных переменны
