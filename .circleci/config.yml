@@ -32,7 +32,7 @@ jobs:
             Version="1-dev"
             echo "GitCommit: ${GitCommit}"
             LDFLAGS="-s -w -X github.com/grengojbo/deploy-cli/version.Version=${Version} -X github.com/grengojbo/deploy-cli/version.GitCommit=${GitCommit}"
-            CGO_ENABLED=0 GOOS=linux go build -a -ldflags ${LDFLAGS} -installsuffix cgo -o dist/deploy-cli main.go
+            CGO_ENABLED=0 GOOS=linux go build -a -ldflags "${LDFLAGS}" -installsuffix cgo -o dist/deploy-cli main.go
       - store_artifacts:
           path: ./dist
           destination: dist
