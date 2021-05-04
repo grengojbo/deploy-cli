@@ -1,6 +1,30 @@
 # Deploy-Cli
 Deploy Utility GIT, Docker, Podman
 
+
+Пароль желательно не передавать через флаг
+```shell
+./deploy-cli -p <PASSWORD> <COMMAND>
+```
+Устанавливайте пароль через системные переменнын
+```shell
+SECRET_SSH_PASSWORD=zzz23 ./deploy-cli run
+```
+
+```shell
+./deploy-cli run --host=example.com -w /home/ubuntu/appname --set=MY_VAR=223=22,MY=weqwe --dry-run --verbose -c "pwd"
+```
+
+Установка системных переменны
+
+```shell
+./deploy-cli --set="MY_ENV=aaa,DEPLOY_MY=bbb" --set=MY_ENV3=ccc run
+```
+Будут переданы переменные окружения
+ ```shell
+export MY_ENV=aaa; export DEPLOY_MY=bbb; export MY_ENV3=ccc;
+```
+
 ## Используемые библиотеки
 
   - https://github.com/robertgzr/porcelain

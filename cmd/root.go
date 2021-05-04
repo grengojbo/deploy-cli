@@ -33,18 +33,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	// "context"
-	// "io/ioutil"
-	// "strings"
-	// rt "runtime"
-	// "github.com/grengojbo/k3ctl/cmd/cluster"
-	// cfg "github.com/rancher/k3d/v4/cmd/config"
-	// "github.com/rancher/k3d/v4/cmd/image"
-	// "github.com/rancher/k3d/v4/cmd/kubeconfig"
-	// "github.com/rancher/k3d/v4/cmd/node"
-	// "github.com/rancher/k3d/v4/cmd/registry"
 	cliutil "github.com/grengojbo/deploy-cli/cmd/util"
-	// "github.com/rancher/k3d/v4/pkg/runtimes"
+	"github.com/grengojbo/deploy-cli/pkg/types"
 	"github.com/grengojbo/deploy-cli/version"
 	log "github.com/sirupsen/logrus"
 	"github.com/sirupsen/logrus/hooks/writer"
@@ -61,7 +51,8 @@ type RootFlags struct {
 }
 
 var AppFlags = RootFlags{}
-var envs = []string{}
+
+// var envs = []string{}
 var Verbose bool
 
 // rootCmd represents the base command when called without any subcommands
@@ -116,19 +107,35 @@ func init() {
 	rootCmd.PersistentFlags().BoolVar(&AppFlags.traceLogging, "trace", false, "Enable super verbose output (trace logging)")
 	rootCmd.PersistentFlags().BoolVar(&AppFlags.timestampedLogging, "timestamps", false, "Enable Log timestamps")
 
-	rootCmd.PersistentFlags().String("host", "", "SSH Host name or IP addres")
+	rootCmd.PersistentFlags().String("host", "", "Public hostname of node on which to run command")
 	_ = viper.BindPFlag("host", rootCmd.PersistentFlags().Lookup("host"))
 
 	rootCmd.PersistentFlags().StringP("password", "p", "", "SSH password")
 	_ = viper.BindPFlag("password", rootCmd.PersistentFlags().Lookup("password"))
 	_ = viper.BindEnv("password", "SECRET_SSH_PASSWORD")
 
-	rootCmd.PersistentFlags().StringP("user", "u", "", "SSH Username")
+	rootCmd.PersistentFlags().StringP("user", "u", "root", "Username for SSH login")
 	_ = viper.BindPFlag("user", rootCmd.PersistentFlags().Lookup("user"))
 	_ = viper.BindEnv("user", "SECRET_SSH_USERNAME")
 
+	rootCmd.PersistentFlags().String("ssh-key", "~/.ssh/id_rsa", "The ssh key to use for remote login")
+	_ = viper.BindPFlag("ssh-key", rootCmd.PersistentFlags().Lookup("ssh-key"))
+
+	rootCmd.PersistentFlags().Int("ssh-port", 22, "The port on which to connect for ssh")
+	_ = viper.BindPFlag("ssh-port", rootCmd.PersistentFlags().Lookup("ssh-port"))
+
+	// rootCmd.PersistentFlags().Bool("sudo", true, "Use sudo for installation. e.g. set to false when using the root user and no sudo is available.")
+	// _ = viper.BindPFlag("sudo", rootCmd.PersistentFlags().Lookup("sudo"))
+
 	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set", []string{}, "Set environment variable")
 	// log.Warnf("ENV: %v", &envs)
+	// cmd.Flags().StringArrayP("port", "p", nil, "Map ports from the node containers to the host (Format: `[HOST:][HOSTPORT:]CONTAINERPORT[/PROTOCOL][@NODEFILTER]`)\n - Example: `k3d cluster create --agents 2 -p 8080:80@agent[0] -p 8081@agent[1]`")
+	// _ = ppViper.BindPFlag("cli.ports", cmd.Flags().Lookup("port"))
+
+	// viper.SetDefault("port", 80)
+
+	rootCmd.PersistentFlags().StringP("workdir", "w", "", "Set workdir")
+	_ = viper.BindPFlag("workdir", rootCmd.PersistentFlags().Lookup("workdir"))
 
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show run command")
 	_ = viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
@@ -181,6 +188,7 @@ func initConfig() {
 		// fmt.Println("------------- initConfig -----------", home)
 	}
 
+	viper.SetEnvPrefix(types.DefaultEnvPrefix)
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.

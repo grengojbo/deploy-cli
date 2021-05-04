@@ -37,3 +37,10 @@ func GetEnvExport(el []string) (result string) {
 	}
 	return result
 }
+
+func GetWorkdir(val string) (result string) {
+	if len(val) > 0 {
+		result = fmt.Sprintf("cd %s; ", val)
+	}
+	return result
+}
