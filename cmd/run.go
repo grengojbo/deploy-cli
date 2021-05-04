@@ -3,6 +3,7 @@ package cmd
 import (
 	"strings"
 
+	"github.com/grengojbo/deploy-cli/pkg/config"
 	"github.com/grengojbo/deploy-cli/pkg/operator"
 	"github.com/grengojbo/deploy-cli/pkg/types"
 	log "github.com/sirupsen/logrus"
@@ -36,6 +37,9 @@ func NewCmdRun() *cobra.Command {
 			host := viper.GetString("host")
 			if len(host) == 0 {
 				log.Fatalln("IS NOT set host")
+			}
+			if len(args) > 0 {
+				config.InitConfig(args[0], strings.ToLower(viper.GetString("env")))
 			}
 			node := &types.NodeOpts{
 				User:             viper.GetString("user"),
