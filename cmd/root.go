@@ -142,6 +142,8 @@ func init() {
 	viper.SetDefault("secret-ssh-key", "")
 	_ = viper.BindEnv("secret-ssh-key", "SECRET_SSH_KEY")
 	_ = viper.BindEnv("ssh-passphrase", "SECRET_SSH_PASSPHRASE")
+	viper.SetDefault("disable-run-command", false)
+	_ = viper.BindEnv("disable-run-command", "SECRET_DEPLOY_DISABLE_RUN")
 
 	// add local flags
 	rootCmd.Flags().BoolVar(&AppFlags.version, "version", false, "Show deploy-cli version")

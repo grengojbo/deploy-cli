@@ -23,6 +23,9 @@ func NewCmdRun() *cobra.Command {
 			// 	log.Errorln("Couldn't get help text")
 			// 	log.Fatalln(err)
 			// }
+			if viper.GetBool("disable-run-command") {
+				log.Fatalln("RUN command disable. Please read the documentation https://zerobox.atlassian.net/wiki/external/10420225/MzhiNWJmMzUyY2Y0NGI0ZThlNTdhYmNlYmI1ZTJjMjU?atlOrigin=eyJpIjoiOTlhODQ1NTkwMDJkNDVhZGE5MTc0Y2UyMmZkZTUwNTUiLCJwIjoiYyJ9")
+			}
 			log.Infoln("Start Run command...")
 
 			host := viper.GetString("host")

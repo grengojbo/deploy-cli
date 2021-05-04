@@ -18,7 +18,7 @@ SECRET_SSH_PASSWORD=zzz23 ./deploy-cli run
 ```
 
 ```shell
-./deploy-cli run --host=example.com -w /home/ubuntu/appname --set=MY_VAR=223=22,MY=weqwe --dry-run --verbose -c "pwd"
+./deploy-cli run --host=example.com -w /home/ubuntu/appname --set-env=MY_VAR=223=22,MY=weqwe --dry-run --verbose -c "pwd"
 ```
 
 Установка системных переменны
