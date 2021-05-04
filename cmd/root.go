@@ -127,7 +127,7 @@ func init() {
 	// rootCmd.PersistentFlags().Bool("sudo", true, "Use sudo for installation. e.g. set to false when using the root user and no sudo is available.")
 	// _ = viper.BindPFlag("sudo", rootCmd.PersistentFlags().Lookup("sudo"))
 
-	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set", []string{}, "Set environment variable")
+	rootCmd.PersistentFlags().StringSliceVar(&AppFlags.Environments, "set-env", []string{}, "Set environment variable")
 	// log.Warnf("ENV: %v", &envs)
 	// cmd.Flags().StringArrayP("port", "p", nil, "Map ports from the node containers to the host (Format: `[HOST:][HOSTPORT:]CONTAINERPORT[/PROTOCOL][@NODEFILTER]`)\n - Example: `k3d cluster create --agents 2 -p 8080:80@agent[0] -p 8081@agent[1]`")
 	// _ = ppViper.BindPFlag("cli.ports", cmd.Flags().Lookup("port"))
@@ -139,6 +139,9 @@ func init() {
 
 	rootCmd.PersistentFlags().Bool("dry-run", false, "Show run command")
 	_ = viper.BindPFlag("dry-run", rootCmd.PersistentFlags().Lookup("dry-run"))
+	viper.SetDefault("secret-ssh-key", "")
+	_ = viper.BindEnv("secret-ssh-key", "SECRET_SSH_KEY")
+	_ = viper.BindEnv("ssh-passphrase", "SECRET_SSH_PASSPHRASE")
 
 	// add local flags
 	rootCmd.Flags().BoolVar(&AppFlags.version, "version", false, "Show deploy-cli version")

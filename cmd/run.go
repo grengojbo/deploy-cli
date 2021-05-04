@@ -24,7 +24,6 @@ func NewCmdRun() *cobra.Command {
 			// 	log.Fatalln(err)
 			// }
 			log.Infoln("Start Run command...")
-			// log.Infoln("Password: ", viper.GetString("password"))
 
 			host := viper.GetString("host")
 			if len(host) == 0 {
@@ -37,6 +36,8 @@ func NewCmdRun() *cobra.Command {
 				Workdir:          viper.GetString("workdir"),
 				SSHAuthorizedKey: viper.GetString("ssh-key"),
 				SshPort:          viper.GetInt32("ssh-port"),
+				SSHKey:           viper.GetString("secret-ssh-key"),
+				SSHPassphrase:    viper.GetString("ssh-passphrase"),
 			}
 			node.SetEnv(AppFlags.Environments)
 			// log.Infof("ssh %s@%s", node.User, node.Host)
