@@ -47,7 +47,9 @@ func (r *SSHOperator) NewSSHOperator(node *types.NodeOpts) {
 		// UseInsecureCipher: true,
 	}
 	r.Config.Server = node.Host
-	if len(node.SSHAuthorizedKey) > 0 {
+	if len(node.Password) > 0 {
+		r.Config.Password = node.Password
+	} else if len(node.SSHAuthorizedKey) > 0 {
 		r.Config.KeyPath = util.ExpandPath(node.SSHAuthorizedKey)
 		log.Debugf("sshKeyPath: %s", r.Config.KeyPath)
 	}

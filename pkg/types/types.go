@@ -21,11 +21,11 @@ THE SOFTWARE.
 */
 package types
 
-import "time"
-
-// "github.com/docker/go-connections/nat"
-// "github.com/grengojbo/k3ctl/pkg/types/k3s"
-// "github.com/grengojbo/k3ctl/version"
+import (
+	"fmt"
+	"strings"
+	"time"
+)
 
 // DefaultRegistryImageRepo defines the default image used for the k3d-managed registry
 const DefaultRegistryImageRepo = "docker.io/library/registry"
@@ -76,6 +76,9 @@ var DefaultNodeEnv = []string{
 	"K3S_KUBECONFIG_OUTPUT=/output/kubeconfig.yaml",
 }
 
+// DefaultEnvPrefix DEPLOY_MYENV
+const DefaultEnvPrefix = "DEPLOY"
+
 // DefaultConfigDirName defines the name of the config directory
 const DefaultConfigDirName = ".deploy" // should end up in $HOME/
 
@@ -110,4 +113,35 @@ type NodeOpts struct {
 	Bastion    string        `mapstructure:"bastion,omitempty" yaml:"bastion" json:"bastion,omitempty"` // Jump host for the environment
 	Wait       bool          `mapstructure:"wait,omitempty" yaml:"wait" json:"wait,omitempty"`
 	Timeout    time.Duration `mapstructure:"timeout,omitempty" yaml:"timeout" json:"timeout,omitempty"`
+}
+
+// GetWorkdir example: cd /home/ubuntu/app_name;
+func (s *NodeOpts) GetWorkdir() (result string) {
+	if len(s.Workdir) > 0 {
+		result = fmt.Sprintf("cd %s; ", s.Workdir)
+	}
+	return result
+}
+
+// GetEnvExport
+func (s *NodeOpts) GetEnvExport() (result string) {
+	for _, item := range s.Env {
+		result = fmt.Sprintf("%s%s ", result, item.AsExport())
+	}
+	return result
+}
+
+// SetEnv setting EnvList
+func (s *NodeOpts) SetEnv(items []string) {
+	for _, item := range items {
+		row := strings.SplitN(item, "=", 2)
+		if len(row) > 1 {
+			res := &EnvVar{
+				Key:   strings.TrimSpace(row[0]),
+				Value: strings.TrimSpace(row[1]),
+			}
+			s.Env = append(s.Env, res)
+			// log.Warnf("key: %s | val: %s", res.Key, res.Value)
+		}
+	}
 }
